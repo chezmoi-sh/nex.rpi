@@ -1,0 +1,43 @@
+# Copyright 2024
+#
+# Everyone is permitted to copy, distribute, modify, merge, sell, publish,
+# sublicense or whatever the fuck they want with this software but at their
+# OWN RISK.
+# The author has absolutely no fucking clue what the code in this project
+# does. It might just fucking work or not, there is no third option.
+#
+# IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+---
+name: Validate OCI (Docker)
+
+on:
+  workflow_call:
+    inputs:
+      application:
+        description: Path of the application to (re)build
+        type: string
+        required: true
+
+permissions: {}
+
+jobs:
+  build_image:
+    name: Docker build
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
+      - uses: docker/setup-buildx-action@2b51285047da1547ffb1b2203d8be4c0af6b1f20 # v3.2.0
+
+      - name: Build base image
+        run: docker build --tag localhost/alpine:stable .
+        working-directory: apps/images/alpine
+      - name: Build application image
+        if: ${{ inputs.application }} != "alpine"
+        run: docker build --tag localhost/app:stable .
+        working-directory: apps/images/alpine/${{ inputs.application }}
