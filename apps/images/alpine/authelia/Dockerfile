@@ -138,6 +138,7 @@ EXPOSE 9091
 VOLUME /var/lib/authelia
 HEALTHCHECK --interval=5s CMD healthcheck.sh
 
+
 # metadata as defined by the Open Container Initiative (OCI) to keep traceability with 
 # the source code.
 LABEL \
